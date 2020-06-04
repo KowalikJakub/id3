@@ -4,7 +4,7 @@ import treelib
 from .metrics.information_gain import information_gain
 
 
-def find_best_feature(X, y):
+def find_best_feature(X: np.ndarray, y: np.ndarray):
     features_indices = np.size(X, 1)
     information_gains = [
         (i, information_gain(X, y, i)) for i in range(features_indices)
