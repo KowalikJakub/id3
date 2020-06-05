@@ -80,18 +80,44 @@ class DecisionTree(Classifier):
         used_features.append(col_index)
         unique_prob_map = count_unique_probs(_y)
         node = self.tree.create_node(
-            tag=f"Node: {col_index}",
+            tag=f"Node {col_index}",
             data={
                 "information_gain": inf_gain,
                 "parent_equals": parent_node_value,
                 "target_distribution": unique_prob_map,
                 "used_features": used_features,
+                "split_on_attr": col_index,
             },
             parent=caller_node,
         )
         split_data = split(_X, _y, col_index)
+        #print (used_features)
         for split_X, split_y, parent_value in split_data:
             self.__fit(split_X, split_y, node, parent_value, used_features.copy())
+
+    def rec_predict(self, X_test, node, index):
+        if node.is_leaf():
+            print ("prediction : " + str(node.data["prediction"]))
+            return node.data["prediction"]
+        tmp_node_attr = node.data["split_on_attr"]
+        attr_value = X_test.at[index, 'Atr'+str(tmp_node_attr+1)]
+        print(tmp_node_attr)
+        print(attr_value)
+        children = self.tree.children(node.identifier)
+        child = next((child for child in children if child.data["parent_equals"] == attr_value), None)
+        if not child:
+            #"target_distribution": unique_prob_map,
+            return None
+
+        #print(child)
+        return self.rec_predict(X_test, child, index)
+
+    def predict(self, X_test):
+        indices = list(X_test.index)
+        #nodes = [node for node in self.tree.all_nodes() if not node.is_leaf()]
+        #split_attr = [node.data["split_on_attr"] for node in self.tree.all_nodes() if not node.is_leaf()]
+        predictions = [self.rec_predict(X_test, self.tree.get_node(self.tree.root), index) for index in indices]
+        print (predictions)
 
     def transform(self, X):
         pass

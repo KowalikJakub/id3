@@ -1,76 +1,23 @@
 import pandas as pd
-
+import matplotlib.pyplot as plt
 from src.id3 import *
 
-data = pd.DataFrame(
-    {
-        "toothed": [
-            "True",
-            "True",
-            "True",
-            "False",
-            "True",
-            "True",
-            "True",
-            "True",
-            "True",
-            "False",
-        ],
-        "hair": [
-            "True",
-            "True",
-            "False",
-            "True",
-            "True",
-            "True",
-            "False",
-            "False",
-            "True",
-            "False",
-        ],
-        "breathes": [
-            "True",
-            "True",
-            "True",
-            "True",
-            "True",
-            "True",
-            "False",
-            "True",
-            "True",
-            "True",
-        ],
-        "legs": [
-            "True",
-            "True",
-            "False",
-            "True",
-            "True",
-            "True",
-            "False",
-            "False",
-            "True",
-            "True",
-        ],
-        "species": [
-            "Mammal",
-            "Mammal",
-            "Reptile",
-            "Mammal",
-            "Mammal",
-            "Mammal",
-            "Reptile",
-            "Reptile",
-            "Mammal",
-            "Reptile",
-        ],
-    },
-    columns=["toothed", "hair", "breathes", "legs", "species"],
-)
+data = pd.read_csv('data/divorce.csv', sep=';')
 
-features = data[["toothed", "breathes", "legs"]]
-target = data["species"]
+features = data.drop('Class', axis=1).astype('category')
+target = data.Class
 
 
+def simple_validation(features, target, train_sample_size):
+    msk = np.random.rand(len(features)) < train_sample_size
+    return features[msk],features[~msk],target[msk],target[~msk]
+
+
+X_train, X_test, Y_train, Y_test = simple_validation(features, target, 0.8)
 model = DecisionTree()
-model.fit(features.values, target.values)
+model.fit(X_train.values, Y_train.values)
+model.tree.show()
+
+
+
+model.predict(X_test)
