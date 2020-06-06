@@ -14,10 +14,9 @@ def simple_validation(features, target, train_sample_size):
 
 
 X_train, X_test, Y_train, Y_test = simple_validation(features, target, 0.8)
-model = DecisionTree()
-model.fit(X_train.values, Y_train.values)
+model = DecisionTree_ID45()
+model.fit(features.values, target.values)
+predictions = model.predict(X_test)
+acc = test_accuracy(Y_test, predictions)
+print (acc)
 model.tree.show()
-
-
-
-model.predict(X_test)
