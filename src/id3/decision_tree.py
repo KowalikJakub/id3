@@ -1,6 +1,7 @@
 import numpy as np
 import treelib
 import pandas as pd
+import copy
 
 from .metrics.information_gain import information_gain
 from .metrics.information_gain import entropy
@@ -55,6 +56,28 @@ def test_accuracy(Y_test, predictions):
             np.dot(1-Y_test,1-predictions.T))/float(Y_test.size)*100)
     return accuracy
 
+def __predict(X_test, node, index, dec_tree):
+    if node.is_leaf():
+        return node.data["prediction"]
+    tmp_node_attr = node.data["split_on_attr"]
+    attr_value = X_test.at[index, 'Atr'+str(tmp_node_attr+1)]
+    child = next((child for child in dec_tree.children(node.identifier)
+            if (((attr_value <= child.data["threshold"] ) and (child.data["threshold_symbol"] == '<='))
+            or  ((attr_value  > child.data["threshold"] ) and (child.data["threshold_symbol"] == '>')))
+            ), None)
+    if not child:
+        if node.data["target_distribution"][0] > node.data["target_distribution"][1]:
+            return 0
+        else:
+            return 1
+    return __predict(X_test, child, index, dec_tree)
+
+def predict(X_test, dec_tree):
+    indices = list(X_test.index)
+    predictions = [__predict(X_test, dec_tree.get_node(dec_tree.root), index, dec_tree)
+                for index in indices]
+    return pd.DataFrame(predictions, index = indices)
+
 class Classifier(object):
     def fit(self, X, y):
         raise NotImplementedError
@@ -67,8 +90,8 @@ class DecisionTree_ID3(Classifier):
     def __init__(self):
         self.tree = treelib.Tree()
 
-    def fit(self, X: np.ndarray, y: np.ndarray) -> None:
-        self.__fit(X, y, None, None, [])
+    def fit(self, X, y) -> None:
+        self.__fit(X.values, y.values, None, None, [])
 
     def __fit(
         self,
@@ -146,16 +169,15 @@ class DecisionTree_ID3(Classifier):
 
 
 class DecisionTree_ID45(Classifier):
-    def __init__(self):
+    def __init__(self, pruning = True):
         self.tree = treelib.Tree()
+        self.pruning = pruning
 
-    def fit(self, X: np.ndarray, y: np.ndarray) -> None:
-        self.__fit(X, y, None, None,"", [])
-        leaves = [leaf for leaf in self.tree.all_nodes() if leaf.is_leaf()]
-        nodes = [node for node in self.tree.all_nodes() if not node.is_leaf()]
-        #print (nodes)
-        for leaf in leaves:
-            parent = self.tree.parent(leaf.identifier)
+    def fit(self, X , y) -> None:
+        self.__fit(X.values, y.values, None, None,"", [])
+        if self.pruning:
+            self.prune(X,y)
+
 
     def __fit(
         self,
@@ -218,35 +240,50 @@ class DecisionTree_ID45(Classifier):
 
 
 
-    def __predict(self, X_test, node, index):
-        if node.is_leaf():
-            return node.data["prediction"]
-        tmp_node_attr = node.data["split_on_attr"]
-        attr_value = X_test.at[index, 'Atr'+str(tmp_node_attr+1)]
-        child = next((child for child in self.tree.children(node.identifier)
-                if (((attr_value <= child.data["threshold"] ) and (child.data["threshold_symbol"] == '<='))
-                or  ((attr_value  > child.data["threshold"] ) and (child.data["threshold_symbol"] == '>')))
-                ), None)
-        if not child:
-            if node.data["target_distribution"][0] > node.data["target_distribution"][1]:
-                return 0
-            else:
-                return 1
-        return self.__predict(X_test, child, index)
+    def prune(self, X, y):
+        prune_tree = copy.deepcopy(self.tree)
+        leaves = [leaf for leaf in prune_tree.all_nodes() if leaf.is_leaf()]
+        nodes = [node for node in prune_tree.all_nodes() if not node.is_leaf()]
+        for leaf in leaves:
+            prune_tree = copy.deepcopy(self.tree)
+            try:
+                parent = prune_tree.parent(leaf.identifier)
+            except:
+                continue
+            if parent == None:
+                continue
+            tmp_tree = prune_tree.subtree(parent.identifier)
+            predictions = predict(X, tmp_tree)
+            acc = 1 - test_accuracy(y, predictions) /100.0
+            e_0 = acc + np.sqrt(acc*(1-acc))/y.size
+            predicton =  0 if parent.data["target_distribution"][0] > parent.data["target_distribution"][1] else 1
+            th = parent.data["threshold"]
+            th_sym = parent.data["threshold_symbol"]
+            parent_data={
+                "parent_equals": parent.data["parent_equals"],
+                "prediction": predicton,
+                "used_features": parent.data["used_features"],
+                "threshold": th,
+                "threshold_symbol":th_sym,
+            }
 
-    def predict(self, X_test):
-        indices = list(X_test.index)
-        predictions = [self.__predict(X_test, self.tree.get_node(self.tree.root), index)
-                    for index in indices]
-        return pd.DataFrame(predictions, index = indices)
+            parent_tag= f"Leaf {th_sym} {th}"
+            parent_parent= prune_tree.parent(parent.identifier)
+            prune_tree.remove_node(parent.identifier)
+            replacing_leaf = prune_tree.create_node(
+                tag=parent_tag,
+                data=parent_data,
+                parent=parent_parent,
+            )
 
-    def transform(self, X):
-        pass
-    def predict(self, X_test):
-        indices = list(X_test.index)
-        predictions = [self.__predict(X_test, self.tree.get_node(self.tree.root), index)
-                    for index in indices]
-        return pd.DataFrame(predictions, index = indices)
+            predictions = predict(X, prune_tree)
+            acc2 = 1 - test_accuracy(y, predictions) /100.0
+            e_1 = acc2 + np.sqrt(acc2*(1-acc2))/y.size
+            if e_0 >= e_1:
+                self.tree = prune_tree
+
+
+
 
 
         '''def fit(self, X: np.ndarray, y: np.ndarray) -> None:
