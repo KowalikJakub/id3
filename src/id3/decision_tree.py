@@ -103,7 +103,7 @@ class DecisionTree_ID3(Classifier):
     ):
         if np.all(_y == _y[0]):
             self.tree.create_node(
-                tag=f"{parent_node_value} Leaf",
+                tag=f"{parent_node_value} Leaf -> prediction {_y[0]}",
                 data={
                     "parent_equals": parent_node_value,
                     "prediction": _y[0],
@@ -130,7 +130,7 @@ class DecisionTree_ID3(Classifier):
         used_features.append(col_index)
         unique_prob_map = count_unique_probs(_y)
         node = self.tree.create_node(
-            tag=f"{parent_node_value} Node {col_index}",
+            tag=f"{parent_node_value} Node [{col_index}]",
             data={
                 "information_gain": inf_gain,
                 "parent_equals": parent_node_value,

@@ -87,13 +87,14 @@ def tree_comparision():
 X_train, X_test, Y_train, Y_test = simple_validation(features, target, 0.8)
 
 tree_comparision()
-id3_parameters = test_id3(300)
-id45_no_prune_parameters = test_id45_no_prune(300)
-id345_parameters = test_id45(300)
 
+#id45_no_prune_parameters = test_id45_no_prune(300)
+#id345_parameters = test_id45(300)
+
+id3_parameters = test_id3(100)
 print("parameters id3 :" + str(id3_parameters))
-print("parameters id4.5 no prune :" + str(id45_no_prune_parameters))
-print("parameters id4.5 :" + str(id345_parameters))
+#print("parameters id4.5 no prune :" + str(id45_no_prune_parameters))
+#print("parameters id4.5 :" + str(id345_parameters))
 #predictions = predict(X_train, model.tree)#model.predict(X_test)
 #acc = test_accuracy(Y_train, predictions)
 
