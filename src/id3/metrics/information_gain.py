@@ -1,3 +1,5 @@
+__author__ = "Sebastian Puchała, Jakub Kowalik"
+
 import numpy as np
 
 from .entropy import entropy
