@@ -5,3 +5,4 @@ from .decision_tree_c45 import *
 from .metrics import *
 from .metrics.entropy import *
 from .metrics.information_gain import *
+from .utils import *

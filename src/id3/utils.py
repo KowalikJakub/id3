@@ -7,6 +7,11 @@ from .metrics.information_gain import information_gain
 from .metrics.information_gain import entropy
 
 
+def simple_validation(features, target, train_sample_size):
+    msk = np.random.rand(len(features)) < train_sample_size
+    return features[msk], features[~msk], target[msk], target[~msk]
+
+
 def find_best_feature(X: np.ndarray, y: np.ndarray, col_filter=[]):
     features_indices = np.size(X, 1)
     information_gains = [
