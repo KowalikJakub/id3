@@ -2,10 +2,19 @@ __author__ = "Sebastian Puchała, Jakub Kowalik"
 
 import pandas as pd
 import numpy as np
-
+import platform
+import os 
 from .metrics.information_gain import information_gain
 from .metrics.information_gain import entropy
 
+def clear():
+    current_platform = platform.system()
+    if current_platform == 'Darwin':
+        os.system('clear')
+    elif current_platform == 'Windows':
+        os.system('cls')
+    elif current_platform == 'Linux':
+        os.system('clear')
 
 def simple_validation(features, target, train_sample_size):
     msk = np.random.rand(len(features)) < train_sample_size
@@ -71,3 +80,6 @@ def test_accuracy(Y_test, predictions):
         * 100
     )
     return accuracy
+
+
+
