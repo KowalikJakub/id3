@@ -32,7 +32,7 @@ class DecisionTree_C45(Classifier):
     ):
         if np.all(_y == _y[0]):
             self.tree.create_node(
-                tag=f"Leaf {th_symbol} {parent_node_value} ",
+                tag=f"Leaf {th_symbol} {parent_node_value}  -> prediction {_y[0]} ",
                 data={
                     "parent_equals": parent_node_value,
                     "prediction": _y[0],
@@ -114,7 +114,7 @@ class DecisionTree_C45(Classifier):
                 "threshold_symbol": th_sym,
             }
 
-            parent_tag = f"Leaf {th_sym} {th}"
+            parent_tag = f"Leaf {th_sym} {th}  -> prediction {predicton}"
             parent_parent = prune_tree.parent(parent.identifier)
             prune_tree.remove_node(parent.identifier)
             replacing_leaf = prune_tree.create_node(
