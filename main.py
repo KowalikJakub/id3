@@ -43,11 +43,18 @@ def menu_C4_5(prunning = True):
     print ("Rozmiar drzewa: " + str(size))
     key_input = input("Nacisnij dowolny klawisz, aby wrocic do menu glownego...")
     menu()
+<<<<<<< HEAD
 
 
 
 def tree_comparision():
     clear()
+=======
+
+
+
+def tree_comparision():
+>>>>>>> master
     print("ID3:")
     model1 = DecisionTree_ID3()
     model1.fit(X_train, Y_train)
@@ -72,11 +79,18 @@ def menu():
     print("(2). Utworz drzewo\n")
     print("(3). Przetestuj algorytmy\n")
     print("(4). Porownanie drzew\n")
+<<<<<<< HEAD
     print("(4). Utworz nowe zbiory uczace i testowe (wylosuj ponownie)\n")
     print("(q). Wyjdz z programu\n")
     print("||================================================||\n")
     key_input = input("Podaj opcje: ")
     while key_input!="q" and key_input!='1' and key_input!='2' and key_input!='3'and key_input!='4'and key_input!='5':
+=======
+    print("(q). Wyjdz z programu\n")
+    print("||================================================||\n")
+    key_input = input("Podaj opcje: ")
+    while key_input!="q" and key_input!='1' and key_input!='2' and key_input!='3'and key_input!='4':
+>>>>>>> master
        key_input = input("Bledna opcja! Sproboj ponownie: ")
     if key_input == "1":
        print_data()
@@ -86,8 +100,11 @@ def menu():
        testAlg()
     if key_input == "4":
        tree_comparision()
+<<<<<<< HEAD
     if key_input == "5":
        new_data_split()
+=======
+>>>>>>> master
     if key_input == "q":
         print("Koniec programu. Dziekuje za skorzystanie")
 
@@ -155,6 +172,7 @@ def createTree():
     if key_input == "q":
         print("Koniec programu. Dziekuje za skorzystanie")
 
+<<<<<<< HEAD
 def new_data_split():
     clear()
     global  X_train, X_test, Y_train, Y_test
@@ -163,6 +181,8 @@ def new_data_split():
     key_input = input("Nacisnij dowolny klawisz, aby wrocic do menu glownego...")
     menu()
 
+=======
+>>>>>>> master
 def test_id3(iter):
     acc = 0
     depth = 0
