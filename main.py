@@ -43,20 +43,13 @@ def menu_C4_5(prunning = True):
     print ("Rozmiar drzewa: " + str(size))
     key_input = input("Nacisnij dowolny klawisz, aby wrocic do menu glownego...")
     menu()
-<<<<<<< HEAD
-=======
 
->>>>>>> master
+
 
 
 
 def tree_comparision():
     clear()
-<<<<<<< HEAD
-=======
-
-def tree_comparision():
->>>>>>> master
     print("ID3:")
     model1 = DecisionTree_ID3()
     model1.fit(X_train, Y_train)
